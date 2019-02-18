@@ -15,6 +15,26 @@ Chunk::Chunk(Columns columns_, UInt64 num_rows_, ChunkInfoPtr chunk_info_)
     checkNumRowsIsConsistent();
 }
 
+static Columns unmuteColumns(MutableColumns && mut_columns)
+{
+    Columns columns;
+    columns.reserve(mut_columns.size());
+    for (auto & col : mut_columns)
+        columns.emplace_back(std::move(col));
+
+    return columns;
+}
+
+Chunk::Chunk(MutableColumns columns_, UInt64 num_rows_)
+    : columns(unmuteColumns(std::move(columns_))), num_rows(num_rows_)
+{
+}
+
+Chunk::Chunk(MutableColumns columns_, UInt64 num_rows_, ChunkInfoPtr chunk_info_)
+    : columns(unmuteColumns(std::move(columns_))), num_rows(num_rows_), chunk_info(std::move(chunk_info_))
+{
+}
+
 Chunk::Chunk(Chunk && other) noexcept
     : columns(std::move(other.columns))
     , num_rows(other.num_rows)
@@ -40,11 +60,7 @@ void Chunk::setColumns(Columns columns_, UInt64 num_rows_)
 
 void Chunk::setColumns(MutableColumns columns_, UInt64 num_rows_)
 {
-    size_t num_columns = columns_.size();
-    columns.resize(num_columns);
-    for (size_t i = 0; i < num_columns; ++i)
-        columns[i] = std::move(columns_[i]);
-
+    columns = unmuteColumns(std::move(columns_));
     num_rows = num_rows_;
     checkNumRowsIsConsistent();
 }
