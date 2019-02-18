@@ -47,6 +47,7 @@ Chunk & Chunk::operator=(Chunk && other) noexcept
 {
     columns = std::move(other.columns);
     chunk_info = std::move(other.chunk_info);
+    num_rows = other.num_rows;
     other.num_rows = 0;
     return *this;
 }

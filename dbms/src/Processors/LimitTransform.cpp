@@ -123,7 +123,7 @@ void LimitTransform::work()
     for (size_t i = 0; i < num_columns; ++i)
         columns[i] = columns[i]->cut(start, length);
 
-    current_chunk.setColumns(std::move(columns), limit);
+    current_chunk.setColumns(std::move(columns), length);
 
     block_processed = true;
 }
