@@ -159,14 +159,15 @@ class NumbersSource : public ISource
 public:
     String getName() const override { return "Numbers"; }
 
-    NumbersSource(UInt64 start_number, unsigned sleep_useconds)
+    NumbersSource(UInt64 start_number, UInt64 step, unsigned sleep_useconds)
             : ISource(Block({ColumnWithTypeAndName{ ColumnUInt64::create(), std::make_shared<DataTypeUInt64>(), "number" }})),
-              current_number(start_number), sleep_useconds(sleep_useconds)
+              current_number(start_number), step(step), sleep_useconds(sleep_useconds)
     {
     }
 
 private:
     UInt64 current_number = 0;
+    UInt64 step;
     unsigned sleep_useconds;
 
     Chunk generate() override
@@ -175,7 +176,7 @@ private:
 
         MutableColumns columns;
         columns.emplace_back(ColumnUInt64::create(1, current_number));
-        ++current_number;
+        current_number += step;
         return Chunk(std::move(columns), 1);
     }
 };
