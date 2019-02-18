@@ -75,7 +75,7 @@ LimitTransform::Status LimitTransform::prepare()
 
     /// Process block.
 
-    size_t rows = current_chunk.rows();
+    size_t rows = current_chunk.getNumRows();
     rows_read += rows;
 
     if (rows_read <= offset)
