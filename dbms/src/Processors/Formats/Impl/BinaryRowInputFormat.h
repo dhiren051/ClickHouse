@@ -1,0 +1,28 @@
+#pragma once
+
+#include <Core/Block.h>
+#include <Processors/Formats/IRowInputFormat.h>
+
+
+namespace DB
+{
+
+class ReadBuffer;
+
+
+/** A stream for inputting data in a binary line-by-line format.
+  */
+class BinaryRowInputFormat : public IRowInputFormat
+{
+public:
+    BinaryRowInputFormat(ReadBuffer & in, Block header, Params params, bool with_names_, bool with_types_);
+
+    bool readRow(MutableColumns & columns, RowReadExtension &) override;
+    void readPrefix() override;
+
+private:
+    bool with_names;
+    bool with_types;
+};
+
+}

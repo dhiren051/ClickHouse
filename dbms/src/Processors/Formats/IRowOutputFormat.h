@@ -46,6 +46,9 @@ public:
     virtual void writeAfterTotals() {};
     virtual void writeBeforeExtremes() {};
     virtual void writeAfterExtremes() {};
+
+private:
+    bool first_row = true;
 };
 
 }
