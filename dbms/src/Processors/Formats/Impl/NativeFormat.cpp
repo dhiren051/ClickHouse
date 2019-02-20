@@ -67,6 +67,21 @@ public:
 
     String getName() const override { return "NativeOutputFormatFromNativeBlockOutputStream"; }
 
+    void setRowsBeforeLimit(size_t rows_before_limit) override
+    {
+        stream->setRowsBeforeLimit(rows_before_limit);
+    }
+
+    void onProgress(const Progress & progress) override
+    {
+        stream->onProgress(progress);
+    }
+
+    std::string getContentType() const override
+    {
+        return stream->getContentType();
+    }
+
 protected:
     void consume(Chunk chunk) override
     {

@@ -27,7 +27,7 @@ public:
     Chunk & operator=(const Chunk & other) = default;
     Chunk & operator=(Chunk && other) noexcept;
 
-    const Columns & getColumns() { return columns; }
+    const Columns & getColumns() const { return columns; }
     void setColumns(Columns columns_, UInt64 num_rows_);
     void setColumns(MutableColumns columns_, UInt64 num_rows_);
     Columns detachColumns();
