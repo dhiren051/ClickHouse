@@ -35,7 +35,7 @@ public:
         Block header,
         ReadBuffer & in,
         Params params)
-        : IInputFormat(header, in), params(std::move(params))
+        : IInputFormat(std::move(header), in), params(params)
     {
     }
 

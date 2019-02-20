@@ -8,6 +8,8 @@ namespace DB
 
 void IRowOutputFormat::consume(DB::Chunk chunk)
 {
+    writePrefixIfNot();
+
     auto num_rows = chunk.getNumRows();
     auto & columns = chunk.getColumns();
 
@@ -23,6 +25,9 @@ void IRowOutputFormat::consume(DB::Chunk chunk)
 
 void IRowOutputFormat::consumeTotals(DB::Chunk chunk)
 {
+    writePrefixIfNot();
+    writeSuffixIfNot();
+
     auto num_rows = chunk.getNumRows();
     if (num_rows != 1)
         throw Exception("Got " + toString(num_rows) + " in totals chunk, expected 1", ErrorCodes::LOGICAL_ERROR);
@@ -30,27 +35,32 @@ void IRowOutputFormat::consumeTotals(DB::Chunk chunk)
     auto & columns = chunk.getColumns();
 
     writeBeforeTotals();
-    write(columns, 0);
+    writeTotals(columns, 0);
     writeAfterTotals();
 }
 
 void IRowOutputFormat::consumeExtremes(DB::Chunk chunk)
 {
+    writePrefixIfNot();
+    writeSuffixIfNot();
+
     auto num_rows = chunk.getNumRows();
     auto & columns = chunk.getColumns();
+    if (num_rows != 2)
+        throw Exception("Got " + toString(num_rows) + " in extremes chunk, expected 2", ErrorCodes::LOGICAL_ERROR);
 
     writeBeforeExtremes();
-
-    for (UInt64 row = 0; row < num_rows; ++row)
-    {
-        if (row != 0)
-            writeRowBetweenDelimiter();
-        first_row = false;
-
-        write(columns, row);
-    }
-
+    writeMinExtreme(columns, 0);
+    writeRowBetweenDelimiter();
+    writeMaxExtreme(columns, 1);
     writeAfterExtremes();
+}
+
+void IRowOutputFormat::finalize()
+{
+    writePrefixIfNot();
+    writeSuffixIfNot();
+    writeLastSuffix();
 }
 
 void IRowOutputFormat::write(const Columns & columns, size_t row_num)
@@ -68,6 +78,21 @@ void IRowOutputFormat::write(const Columns & columns, size_t row_num)
     }
 
     writeRowEndDelimiter();
+}
+
+void IRowOutputFormat::writeMinExtreme(const DB::Columns & columns, size_t row_num)
+{
+    write(columns, row_num);
+}
+
+void IRowOutputFormat::writeMaxExtreme(const DB::Columns & columns, size_t row_num)
+{
+    write(columns, row_num);
+}
+
+void IRowOutputFormat::writeTotals(const DB::Columns & columns, size_t row_num)
+{
+    write(columns, row_num);
 }
 
 }

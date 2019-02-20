@@ -30,10 +30,13 @@ protected:
     Chunk current_chunk;
     PortKind current_block_kind;
     bool has_input = false;
+    bool finished = false;
+    bool finalized = false;
 
     virtual void consume(Chunk) = 0;
     virtual void consumeTotals(Chunk) {}
     virtual void consumeExtremes(Chunk) {}
+    virtual void finalize() {}
 
 public:
     IOutputFormat(Block header, WriteBuffer & out);

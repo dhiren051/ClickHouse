@@ -35,11 +35,23 @@ IOutputFormat::Status IOutputFormat::prepare()
         return Status::Ready;
     }
 
+    finished = true;
+
+    if (!finalized)
+        return Status::Ready;
+
     return Status::Finished;
 }
 
 void IOutputFormat::work()
 {
+    if (finished && !finalized)
+    {
+        finalize();
+        finalized = true;
+        return;
+    }
+
     switch (current_block_kind)
     {
         case Main:
